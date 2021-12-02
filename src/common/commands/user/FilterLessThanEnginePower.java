@@ -35,7 +35,7 @@ public class FilterLessThanEnginePower extends Command {
      * @param arguments необходимые для исполнения аргументы.
      */
     @Override
-    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction,  String arguments, DataBaseCenter dataBaseCenter, User user) throws IOException {
         long enginePower = 0;
         try {
             if (ValidationClass.validateLong(arguments, true, ui, false))

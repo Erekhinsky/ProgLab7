@@ -157,7 +157,7 @@ public class Client {
             User user = new User(login, password);
             cmd.setUser(user);
             cmdByte = SerializationTool.serialize(cmd);
-            send(cmdByte);
+            sendServerCommand(cmd);
             String answer = receive();
             if (answer.contains(" не "))
                 return false;
@@ -184,7 +184,7 @@ public class Client {
             User user = new User(login, password);
             cmd.setUser(user);
             cmdByte = SerializationTool.serialize(cmd);
-            send(cmdByte);
+            sendServerCommand(cmd);
             String answer = receive();
             if (answer.contains(" не "))
                 return false;

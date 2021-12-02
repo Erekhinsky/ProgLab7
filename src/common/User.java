@@ -15,6 +15,10 @@ public class User implements Serializable {
         return login;
     }
 
+    public User getUser() {
+        return this;
+    }
+
     public String getPassword() {
         return password;
     }

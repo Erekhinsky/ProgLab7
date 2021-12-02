@@ -1,5 +1,6 @@
 package common.commands.server;
 
+import common.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
@@ -31,7 +32,7 @@ public class Save extends Command {
      * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, User user) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction,DataBaseCenter dataBaseCenter, User user) throws IOException {
         storageInteraction.save();
         return ("Коллекция сохранена в файл");
     }

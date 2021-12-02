@@ -112,21 +112,8 @@ public class CommandCenter {
      *
      * @param ui Объект взаимодействия с пользователем.
      */
-//    public String executeCommand(UserInterface ui, String line, StorageInteraction storageInteraction) throws IOException {
-//        collectionLock.lock();
-//        logger.log(Level.INFO, "Executing server command initiated by user's actions" + "\n");
-//        Command cmd = getCmdCommand(line);
-//        return cmd.execute(ui, storageInteraction, cmd.getUser());
-//        if (collectionLock.isLocked()) collectionLock.unlock();
-//
-//        collectionLock.lock();
-//        logger.log(Level.INFO, "Executing server command");
-//        cmd.execute(storageInteraction);
-//        if (collectionLock.isLocked()) collectionLock.unlock();
-//    }
-
     public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction) throws IOException {
-        logger.log(Level.INFO, "Executing server command initiated by user's actions");
+        logger.log(Level.INFO, "Executing server command");
         String result = cmd.execute(ui, storageInteraction, cmd.getUser());
         return result;
     }
@@ -142,12 +129,12 @@ public class CommandCenter {
     public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with a string argument");
-        String result = cmd.execute(ui, argument, storageInteraction, dataBaseCenter, cmd.getUser());
+        String result = cmd.execute(ui, storageInteraction, argument, dataBaseCenter, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
         return result;
     }
 
-    public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IncorrectValueException {
+    public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IncorrectValueException, IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with an object argument");
         String result = cmd.execute(ui, storageInteraction, vehicle, dbc, cmd.getUser());
@@ -155,7 +142,7 @@ public class CommandCenter {
         return result;
     }
 
-    public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) {
+    public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with two arguments");
         String result = cmd.execute(ui, storageInteraction, argument, vehicle, dbc, cmd.getUser());
@@ -163,19 +150,41 @@ public class CommandCenter {
         return result;
     }
 
-    public String executeCommand(UserInterface ui, Command cmd, boolean success, DataBaseCenter dbc) {
-        collectionLock.lock();
-        logger.log(Level.INFO, "Executing user command with two string arguments");
-        String result = cmd.execute(ui, success);
-        if (collectionLock.isLocked()) collectionLock.unlock();
-        return result;
-    }
+//    public String executeCommand(UserInterface ui, Command cmd, boolean success, DataBaseCenter dbc) {
+//        collectionLock.lock();
+//        logger.log(Level.INFO, "Executing user command with two string arguments");
+//        String result = cmd.execute(ui, success);
+//        if (collectionLock.isLocked()) collectionLock.unlock();
+//        return result;
+//    }
 
-    public String executeServerCommand(Command cmd, StorageInteraction storageInteraction) throws IOException {
-        collectionLock.lock();
-        logger.log(Level.INFO, "Executing server command");
-        String result = cmd.execute(storageInteraction);
-        collectionLock.unlock();
-        return result;
-    }
+//    public String executeCommand(Command cmd) {
+//        if (cmd.getServerCommandLabel()) {
+//
+//        }
+//        if (cmd.getNeedsObject()) {
+//
+//        }
+//        if (cmd.isEditsCollection()) {
+//
+//        }
+//        if (cmd.getArgumentAmount() == 0) {
+//            if (cmd.getNeedsObject()) {
+//
+//            } else {
+//
+//            }
+//        }
+//        else if (cmd.getNeedsObject()) {
+//
+//        } else {
+//
+//        }
+//        if (cmd.getUser() != null) {
+//
+//        }
+//        if (cmd.getNeedsObject())
+//        String result = cmd.execute();
+//        return result;
+//    }
 }

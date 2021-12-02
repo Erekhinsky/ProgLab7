@@ -29,7 +29,7 @@ public class ServerInfo extends Command {
      */
     @Override
     public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
-        return "";
+        return "SMTH";
     }
 
 }

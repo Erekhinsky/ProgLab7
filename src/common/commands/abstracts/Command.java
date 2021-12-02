@@ -42,10 +42,16 @@ public abstract class Command implements Serializable {
      * Методы исполнения команды.
      *
      * @param ui       Объект для взаимодействия с пользователем.
-     * @param argument Аргументы для исполнения команды.
-     * @param vehicle  Объект коллекции.
      */
-    public String execute(UserInterface ui, StorageInteraction si, String argument, Vehicle vehicle, DataBaseCenter dbc, User user) {
+    public String execute(UserInterface ui, StorageInteraction si, String argument, Vehicle vehicle, DataBaseCenter dbc, User user) throws IOException {
+        return null;
+    }
+
+    public String execute(UserInterface ui, StorageInteraction si, Vehicle vehicle, DataBaseCenter dbc, User user) throws IOException, IncorrectValueException {
+        return null;
+    }
+
+    public String execute(UserInterface ui, StorageInteraction si, String argument, DataBaseCenter dbc, User user) throws IOException {
         return null;
     }
 
@@ -57,25 +63,7 @@ public abstract class Command implements Serializable {
         return null;
     }
 
-    public String execute(UserInterface ui, String argument, StorageInteraction si, DataBaseCenter dbc, User user) throws IOException {
-        return null;
-    }
 
-    public String execute(UserInterface ui, StorageInteraction si, Vehicle vehicle, DataBaseCenter dbc, User user) throws IncorrectValueException {
-        return null;
-    }
-
-    public String execute(StorageInteraction si) throws IOException {
-        return null;
-    }
-
-    public String execute(UserInterface ui, boolean success) {
-        return null;
-    }
-
-    public String execute(StorageInteraction si, boolean success) {
-        return null;
-    }
 
     /**
      * Пустой конструктор Command.

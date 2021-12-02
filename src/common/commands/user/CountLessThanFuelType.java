@@ -36,7 +36,7 @@ public class CountLessThanFuelType extends Command {
      * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, String arguments, DataBaseCenter dbc, User user) throws IOException {
         int result;
         if (ValidationClass.validateFuelType(arguments, true, ui)) {
             FuelType fuelType = FuelType.valueOf(arguments.toUpperCase());
