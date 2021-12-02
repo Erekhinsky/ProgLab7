@@ -1,5 +1,7 @@
 package common.commands.user;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.exception.IncorrectValueException;
 import common.ui.UserInterface;
@@ -23,6 +25,7 @@ public class RemoveById extends Command {
         needsObject = false;
         argumentAmount = 1;
         serverCommandLabel = false;
+        editsCollection = true;
     }
 
     /**
@@ -31,7 +34,7 @@ public class RemoveById extends Command {
      * @param ui        объект, через который ведется взаимодействие с пользователем.
      * @param arguments необходимые для исполнения аргументы.
      */
-    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
         long id = 0;
         try {
             if (ValidationClass.validateLong(arguments, true, ui, false))
@@ -40,8 +43,9 @@ public class RemoveById extends Command {
         } catch (IOException | IncorrectValueException e) {
             e.printStackTrace();
         }
-        if (storageInteraction.findById(id)) {
+        if (storageInteraction.findById(id) && dbc.removeVehicle(id, user)) {
             storageInteraction.removeById(id);
+            dbc.retrieveCollectionFromDB(storageInteraction);
             return ("Транспорт удален");
         } else return ("Транспорт с таким id не найден");
     }

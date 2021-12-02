@@ -1,5 +1,7 @@
 package common.commands.user;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.exception.IncorrectValueException;
 import common.ui.UserInterface;
@@ -23,6 +25,7 @@ public class FilterLessThanEnginePower extends Command {
         needsObject = false;
         argumentAmount = 1;
         serverCommandLabel = false;
+        editsCollection = false;
     }
 
     /**
@@ -32,7 +35,7 @@ public class FilterLessThanEnginePower extends Command {
      * @param arguments необходимые для исполнения аргументы.
      */
     @Override
-    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         long enginePower = 0;
         try {
             if (ValidationClass.validateLong(arguments, true, ui, false))

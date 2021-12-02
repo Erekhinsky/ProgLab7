@@ -2,7 +2,10 @@ package server;
 
 import common.DataBaseCenter;
 import common.SerializationTool;
+import common.User;
 import common.commands.abstracts.Command;
+import common.commands.server.Login;
+import common.commands.server.Register;
 import common.commands.server.Save;
 import common.elementsOfCollection.Vehicle;
 import common.exception.IncorrectValueException;
@@ -18,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
@@ -41,7 +45,8 @@ public class Server implements Runnable {
     private boolean authorisation = false;
 
     private static ExecutorService executorService = Executors.newCachedThreadPool();
-    private DataBaseCenter dbs = new DataBaseCenter();
+    ForkJoinPool forkJoinPool = new ForkJoinPool();
+    private DataBaseCenter dbc = new DataBaseCenter();
 
     public static ExecutorService getExecutorService() {
         return executorService;
@@ -51,7 +56,7 @@ public class Server implements Runnable {
     public Server(DataBaseCenter dataBaseCenter) {
         int PORT = 8725;
         this.socketAddress = new InetSocketAddress(PORT);
-        this.dbs = dataBaseCenter;
+        this.dbc = dataBaseCenter;
         if (firstOpen) logger.log(Level.INFO, "Сервер начал работу." + "\n");
         Server.firstOpen = false;
     }
@@ -77,7 +82,7 @@ public class Server implements Runnable {
         logger.log(Level.INFO, "Канал открыт и привязан к адресу." + "\n");
     }
 
-    private Object readRequest() throws IOException {
+    public Object readRequest() throws IOException {
         byte[] buffer = new byte[65536];
         ByteBuffer bufferAnswer = ByteBuffer.wrap(buffer);
         socketAddress = datagramChannel.receive(bufferAnswer);
@@ -85,43 +90,54 @@ public class Server implements Runnable {
         return SerializationTool.deserialize(bufferAnswer.array());
     }
 
-    public String executeCommand(Command cmd) throws IOException, IncorrectValueException {
+    public String executeCommand(Command cmd) throws IOException, IncorrectValueException, SQLException {
         String argument;
         Vehicle vehicle;
-        if (cmd.getCmdLine().equals("exit")) {
-            logger.log(Level.INFO, "Начато сохранение коллекции" + "\n");
-            return CommandCenter.getInstance().executeCommand(userInterface, "save", storageInteraction, dbs);
-        } else {
-            if (cmd.getArgumentAmount() == 0) {
-                logger.log(Level.INFO, "Выполнение команды без аргументов - " + cmd.getCmdLine() + "\n");
-                if (cmd.getServerCommandLabel())
-                    return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, dbs);
-                else
-                    return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction) + "\nВведите команду:";
+        if (cmd.getClass().toString().contains(".Register"))
+            authorisation = authoriseUser(cmd.getUser(), "new");
+        if (cmd.getClass().toString().contains(".Login"))
+            authorisation = authoriseUser(cmd.getUser(), "old");
+        if (authorisation) {
+            if (cmd.getCmdLine().equals("exit")) {
+                Command save = new Save();
+                save.setUser(cmd.getUser());
+                logger.log(Level.INFO, "Начато сохранение коллекции" + "\n");
+                return CommandCenter.getInstance().executeCommand(userInterface, save, storageInteraction, dbc);
+            } else {
+                if (cmd.getArgumentAmount() == 0) {
+                    logger.log(Level.INFO, "Выполнение команды без аргументов - " + cmd.getCmdLine() + "\n");
+                    if (cmd.getServerCommandLabel())
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, dbc);
+                    else
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction) + "\nВведите команду:";
+                }
+                if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
+                    logger.log(Level.INFO, "Выполнение команды с аргументом - " + cmd.getCmdLine() + "\n");
+                    argument = cmd.getArgument();
+                    if (cmd.getServerCommandLabel())
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, dbc);
+                    else
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, dbc) + "\nВведите команду:";
+                }
+                if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
+                    logger.log(Level.INFO, "Выполнение команды с аргументом-объектом - " + cmd.getCmdLine() + "\n");
+                    vehicle = cmd.getObject();
+                    if (cmd.getServerCommandLabel())
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle, dbc);
+                    else
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle, dbc) + "\nВведите команду:";
+                }
+                if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
+                    logger.log(Level.INFO, "Выполнение команды с аргументом и аргументом-объектом - " + cmd.getCmdLine() + "\n");
+                    argument = cmd.getArgument();
+                    vehicle = cmd.getObject();
+                    if (cmd.getServerCommandLabel())
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle, dbc);
+                    else
+                        return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle, dbc) + "\nВведите команду:";
+                } else return "Слишком много аргументов.";
             }
-            if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
-                logger.log(Level.INFO, "Выполнение команды с аргументом - " + cmd.getCmdLine() + "\n");
-                argument = cmd.getArgument();
-                if (cmd.getServerCommandLabel())
-                    return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, dbs);
-                else return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction) + "\nВведите команду:";
-            }
-            if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
-                logger.log(Level.INFO, "Выполнение команды с аргументом-объектом - " + cmd.getCmdLine() + "\n");
-                vehicle = cmd.getObject();
-                if (cmd.getServerCommandLabel())
-                    return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle);
-                else return CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle) + "\nВведите команду:";
-            }
-            if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
-                logger.log(Level.INFO, "Выполнение команды с аргументом и аргументом-объектом - " + cmd.getCmdLine() + "\n");
-                argument = cmd.getArgument();
-                vehicle = cmd.getObject();
-                if (cmd.getServerCommandLabel())
-                    return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle);
-                else return CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle) + "\nВведите команду:";
-            } else return "Слишком много аргументов.";
-        }
+        } else return null;
     }
 
     public void sendAnswer(String str) throws IOException {
@@ -143,6 +159,9 @@ public class Server implements Runnable {
         try {
             storageInteraction = new StorageInteraction(vehicleStorage, path);
             FileHelper.readFile(path, storageInteraction);
+
+            dbc.createTable();
+            dbc.retrieveCollectionFromDB(storageInteraction);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 Server.logger.log(Level.INFO, "Сохранение коллекции." + "\n");
@@ -168,17 +187,63 @@ public class Server implements Runnable {
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
                 Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
                 while (keyIterator.hasNext()) {
-                    Server.setStringMessage(null);
+                    System.out.println("Установлен нал");
                     SelectionKey key = keyIterator.next();
                     if (key.isReadable()) {
                         datagramChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                     }
                     if (key.isWritable()) {
                         if (stringMessage != null){
-                            sendAnswer(stringMessage + executeCommand((Command) readRequest()));
+
+                            Command cmd = forkJoinPool.invoke(new TaskForRequest(this));
+
+                            Future<String> executor = executorService.submit(()->{
+                                try {
+                                    String cmdString = executeCommand(cmd);
+                                    System.out.println(cmdString);
+                                    return cmdString;
+                                } catch (IOException | IncorrectValueException e) {
+                                    e.printStackTrace();
+                                } return null;
+                            });
+
+                            String commandResult = executor.get();
+                            System.out.println(commandResult + " :::: ");
+
+                            executorService.submit(() -> {
+                                try {
+                                    System.out.println("SM + CM =: \n");
+                                    sendAnswer(stringMessage + "\n" + commandResult);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+
                             stringMessage = null;
+
                         }
-                        else sendAnswer(executeCommand((Command) readRequest()));
+                        else {
+                            Command cmd = forkJoinPool.invoke(new TaskForRequest(this));
+
+                            Future<String> executor = executorService.submit(()->{
+                                try {
+                                    return executeCommand(cmd);
+                                } catch (IOException | IncorrectValueException e) {
+                                    e.printStackTrace();
+                                } return null;
+                            });
+
+                            String commandResult = executor.get();
+                            System.out.println(commandResult + " :::: ");
+
+                            executorService.submit(() -> {
+                                try {
+                                    sendAnswer(commandResult);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                        }
                         datagramChannel.register(selector, SelectionKey.OP_READ);
                     }
                     keyIterator.remove();
@@ -199,5 +264,29 @@ public class Server implements Runnable {
 
     public static String getStringMessage() {
         return stringMessage.toString();
+    }
+
+    public boolean authoriseUser(User user, String existence) throws IOException, SQLException {
+        if (existence.equals("new")) {
+            if (dbc.addUser(user)) {
+                CommandCenter.getInstance().executeCommand(userInterface, new Register(), storageInteraction);
+                System.out.println(user + " " + "REG SUC");
+                return true;
+            } else {
+                CommandCenter.getInstance().executeCommand(userInterface, new Register(), storageInteraction);
+                System.out.println(user + " " + "REG fail");
+                return false;
+            }
+        } else {
+            if (dbc.loginUser(user)) {
+                CommandCenter.getInstance().executeCommand(userInterface, new Login(), storageInteraction);
+                System.out.println(user + " " + "LOG SUC");
+                return true;
+            } else {
+                CommandCenter.getInstance().executeCommand(userInterface, new Login(), storageInteraction);
+                System.out.println(user + " " + "LOG fail");
+                return false;
+            }
+        }
     }
 }

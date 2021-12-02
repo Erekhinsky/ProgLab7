@@ -19,7 +19,7 @@ public class QueryConstants {
             "x DOUBLE PRECISION NOT NULL, y DOUBLE PRECISION NOT NULL, creationdate DATE NOT NULL, enginepower BIGINT NOT NULL CHECK (enginepower > 0), " +
             "numberofwheels BIGINT CHECK (numberofwheels > 0) , distancetravelled DOUBLE PRECISION CHECK (distancetravelled > 0), fueltype VARCHAR(50), username VARCHAR(50));";
 
-    public final static String USER_TABLE = "CREATE TABLE IF NOT EXISTS users (username VARCHAR(50) UNIQUE, password VARCHAR(100));";
+    public final static String USER_TABLE = "CREATE TABLE IF NOT EXISTS users (username VARCHAR(50) UNIQUE, password VARCHAR(500));";
 }
 
 //1 name

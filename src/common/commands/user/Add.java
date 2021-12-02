@@ -48,20 +48,11 @@ public class Add extends Command implements Serializable {
 //            return ("Транспорт успешно добавлен");
 //        else return ("Такой транспорт уже есть");
 
-        Server.getExecutorService().execute(() -> {
-            try {
-                if (dbc.addVehicle(vehicle, user)) {
-                    storageInteraction.add(vehicle);
-                    messageToClient.append("Транспорт успешно добавлен\n");
-                    dbc.retrieveCollectionFromDB(storageInteraction);
-                } else messageToClient.append("Такой транспорт уже есть\n");
-                if (ui.isInteractionMode()) {
-                    messageToClient.append("Ожидаем дальнейших инструкций от клиента.\n");
-                }
-            } catch (IncorrectValueException e) {
-                e.printStackTrace();            //
-            }
-        });
-        return messageToClient.toString();
+        if (dbc.addVehicle(vehicle, user)) {
+            storageInteraction.add(vehicle);
+            dbc.retrieveCollectionFromDB(storageInteraction);
+            return ("Транспорт успешно добавлен\n");
+        } else return ("Такой транспорт уже есть\n");
+
     }
 }

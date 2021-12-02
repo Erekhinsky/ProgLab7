@@ -77,24 +77,24 @@ public class ExecuteScript extends Command {
                         } else {
                             if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
                                 Vehicle vehicle = scriptInteraction.readVehicle(scriptInteraction);
-                                result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, storageInteraction, vehicle)).append("\n");
+                                result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, storageInteraction, vehicle, dbc)).append("\n");
                             }
                             if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
                                 if (cmd.getCmdLine().equals("execute_script")) {
                                     paths.forEach(System.out::println);
                                     if (!paths.contains(cmdArgument)) {
                                         paths.add(cmdArgument);
-                                        result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction)).append("\n");
+                                        result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, dbc)).append("\n");
                                     } else {
                                         paths.clear();
                                         throw new InvalidAlgorithmParameterException("Выполнение скрипта остановлено, т.к. возможна рекурсия");
                                     }
                                 } else
-                                    result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction)).append("\n");
+                                    result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, dbc)).append("\n");
                             }
                             if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
                                 Vehicle vehicle = scriptInteraction.readVehicle(scriptInteraction);
-                                result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, vehicle)).append("\n");
+                                result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, vehicle, dbc)).append("\n");
                             }
                         }
                     } else result.append("Команда в скрипте: ").append(cmdLine).append(" не является командой\n");

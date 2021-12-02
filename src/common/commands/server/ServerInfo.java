@@ -1,5 +1,7 @@
 package common.commands.server;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
 import server.interaction.StorageInteraction;
@@ -16,6 +18,7 @@ public class ServerInfo extends Command {
         needsObject = false;
         argumentAmount = 0;
         serverCommandLabel = true;
+        editsCollection = false;
     }
 
     /**
@@ -25,7 +28,7 @@ public class ServerInfo extends Command {
      * @return Результат команды.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         return "";
     }
 

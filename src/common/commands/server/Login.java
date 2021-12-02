@@ -10,6 +10,7 @@ public class Login extends Command {
         needsObject = false;
         argumentAmount = 2;
         serverCommandLabel = true;
+        editsCollection = false;
     }
 
     public String execute(UserInterface ui, boolean success) {

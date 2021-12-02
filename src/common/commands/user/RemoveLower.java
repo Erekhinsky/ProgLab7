@@ -1,5 +1,7 @@
 package common.commands.user;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
 import common.elementsOfCollection.Vehicle;
@@ -20,6 +22,7 @@ public class RemoveLower extends Command {
         needsObject = true;
         argumentAmount = 1;
         serverCommandLabel = false;
+        editsCollection = true;
     }
 
     /**
@@ -28,12 +31,14 @@ public class RemoveLower extends Command {
      * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, Vehicle vehicle) {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) {
         int size1 = storageInteraction.getSize();
         storageInteraction.removeLower(vehicle);
         int size2 = storageInteraction.getSize();
-        if (size2 < size1)
+        if (size2 < size1) {
+            dbc.retrieveCollectionFromDB(storageInteraction);
             return ("Операция успешно выполнена");
+        }
         else return "Что-то пошло не так";
     }
 }

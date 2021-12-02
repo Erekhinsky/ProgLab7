@@ -33,28 +33,13 @@ public class AddIfMax extends Command {
      * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) {
-//        int size1 = storageInteraction.getSize();
-//        storageInteraction.addIfMax(vehicle);
-//        int size2 = storageInteraction.getSize();
-//        if (size2 > size1) {
-//            return ("Операция успешно выполнена");
-//        } else return ("Похоже, добавляемый объект меньше максимального или уже существует.");
-
-        Server.getExecutorService().execute(() -> {
-            try {
-                if (dbc.addVehicle(vehicle, user)) {
-                    storageInteraction.addIfMax(vehicle);
-                    messageToClient.append("Операция успешно выполнена\n");
-                    dbc.retrieveCollectionFromDB(storageInteraction);
-                } else messageToClient.append("Похоже, добавляемый объект меньше максимального или уже существует.\n");
-                if (ui.isInteractionMode()) {
-                    messageToClient.append("Ожидаем дальнейших инструкций от клиента.\n");
-                }
-            } catch (IncorrectValueException e) {
-                e.printStackTrace();            //
-            }
-        });
-        return messageToClient.toString();
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) throws IncorrectValueException {
+        int size1 = storageInteraction.getSize();
+        storageInteraction.addIfMax(vehicle);
+        int size2 = storageInteraction.getSize();
+        if ((size2 > size1) && dbc.addVehicle(vehicle, user))  {
+            dbc.retrieveCollectionFromDB(storageInteraction);
+            return ("Операция успешно выполнена");
+        } else return ("Похоже, добавляемый объект меньше максимального или уже существует.");
     }
 }

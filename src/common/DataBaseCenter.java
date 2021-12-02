@@ -15,7 +15,7 @@ public class DataBaseCenter {
     private String user = "postgres";
     //    private final String URL = "jdbc:postgresql://pg:5432/studs";
     //    private final String user = "s311774";
-    private String password = "";
+    private String password = "ykh666";
 
     public DataBaseCenter() {
         try {
@@ -30,6 +30,7 @@ public class DataBaseCenter {
             PreparedStatement preparedStatement = connection.prepareStatement(QueryConstants.USER_INSERTION);
             preparedStatement.setString(1, newUser.getLogin());
             preparedStatement.setString(2, newUser.getPassword());
+            System.out.println(newUser.getLogin() + " " + newUser.getPassword());
             preparedStatement.execute();
             return true;
         } catch (SQLException e) {
@@ -178,7 +179,7 @@ public class DataBaseCenter {
         }
     }
 
-    public boolean createTable() {
+    public void createTable() {
         try (Connection connection = DriverManager.getConnection(URL, user, password)) {
             PreparedStatement statement = connection.prepareStatement(QueryConstants.ID_GENERATING_SEQUENCE);
             statement.execute();
@@ -186,10 +187,8 @@ public class DataBaseCenter {
             statement.execute();
             statement = connection.prepareStatement(QueryConstants.USER_TABLE);
             statement.execute();
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
     }
 

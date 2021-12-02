@@ -125,44 +125,50 @@ public class CommandCenter {
 //        if (collectionLock.isLocked()) collectionLock.unlock();
 //    }
 
-    public void executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction) throws IOException {
+    public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction) throws IOException {
         logger.log(Level.INFO, "Executing server command initiated by user's actions");
-        cmd.execute(ui, storageInteraction, cmd.getUser());
+        String result = cmd.execute(ui, storageInteraction, cmd.getUser());
+        return result;
     }
 
-    public void executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
+    public String  executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with no arguments");
-        cmd.execute(ui, storageInteraction, dataBaseCenter, cmd.getUser());
+        String result = cmd.execute(ui, storageInteraction, dataBaseCenter, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
+        return result;
     }
 
-    public void executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
+    public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with a string argument");
-        cmd.execute(ui, argument, storageInteraction, dataBaseCenter, cmd.getUser());
+        String result = cmd.execute(ui, argument, storageInteraction, dataBaseCenter, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
+        return result;
     }
 
-    public void executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IncorrectValueException {
+    public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IncorrectValueException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with an object argument");
-        cmd.execute(ui, storageInteraction, vehicle, dbc, cmd.getUser());
+        String result = cmd.execute(ui, storageInteraction, vehicle, dbc, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
+        return result;
     }
 
-    public void executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) {
+    public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with two arguments");
-        cmd.execute(ui, storageInteraction, argument, vehicle, dbc, cmd.getUser());
+        String result = cmd.execute(ui, storageInteraction, argument, vehicle, dbc, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
+        return result;
     }
 
-    public void executeCommand(UserInterface ui, Command cmd, boolean success, DataBaseCenter dbc) {
+    public String executeCommand(UserInterface ui, Command cmd, boolean success, DataBaseCenter dbc) {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with two string arguments");
-        cmd.execute(ui, success);
+        String result = cmd.execute(ui, success);
         if (collectionLock.isLocked()) collectionLock.unlock();
+        return result;
     }
 
     public String executeServerCommand(Command cmd, StorageInteraction storageInteraction) throws IOException {

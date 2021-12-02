@@ -1,5 +1,7 @@
 package common.commands.user;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
 import server.interaction.StorageInteraction;
@@ -21,6 +23,7 @@ public class Info extends Command {
         needsObject = false;
         argumentAmount = 0;
         serverCommandLabel = false;
+        editsCollection = false;
     }
 
     /**
@@ -29,7 +32,7 @@ public class Info extends Command {
      * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         return (storageInteraction.info());
     }
 }

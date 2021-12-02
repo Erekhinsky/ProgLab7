@@ -1,5 +1,7 @@
 package common.commands.user;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.ui.CommandCenter;
 import common.ui.UserInterface;
@@ -23,6 +25,7 @@ public class Help extends Command {
         needsObject = false;
         argumentAmount = 0;
         serverCommandLabel = false;
+        editsCollection = false;
     }
 
     /**
@@ -32,7 +35,7 @@ public class Help extends Command {
      * @return Результат команды.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         StringBuilder display = new StringBuilder();
         for (Command cmd : CommandCenter.getInstance().receiveAllCommands()) {
             if (!cmd.getServerCommandLabel())

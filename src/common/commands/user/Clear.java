@@ -35,24 +35,13 @@ public class Clear extends Command {
      * @return Результат команды.
      */
     public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
-//        storageInteraction.clear();
-//        if (storageInteraction.getSize() > 0)
-//            return ("Что-то пошло не так, попробуйте еще раз");
-//        else return ("Коллекция очищена");
-
-        Server.getExecutorService().execute(() -> {
-            if (!(dbc.clearCollection(user))) {
-                messageToClient.append("Что-то пошло не так.\n");
-            } else {
-                storageInteraction.clear();
-                messageToClient.append("Коллекция очищена\n");
-                dbc.retrieveCollectionFromDB(storageInteraction);
-            }
-            if (ui.isInteractionMode()) {
-                messageToClient.append("Ожидаем дальнейших инструкций от клиента.\n");
-            }
-        });
-        return messageToClient.toString();
+        if (!(dbc.clearCollection(user)))
+            return "Что-то пошло не так, попробуйте еще раз";
+        else {
+            storageInteraction.clear();
+            dbc.retrieveCollectionFromDB(storageInteraction);
+            return("Коллекция очищена");
+        }
     }
 }
 

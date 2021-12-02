@@ -37,27 +37,11 @@ public class CountLessThanFuelType extends Command {
      */
     @Override
     public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
-//        int result;
-//        if (ValidationClass.validateFuelType(arguments, true, ui)) {
-//            FuelType fuelType = FuelType.valueOf(arguments.toUpperCase());
-//            result = storageInteraction.countLessThanFuelType(fuelType);
-//        } else return ("Неверно введено значение Fuel Type.");
-//        return ("Элементов с типом топлива, меньше указанного: " + result);
-
-        Server.getExecutorService().execute(() -> {
-            try {
-                if (ValidationClass.validateFuelType(arguments, true, ui)) {
-                    FuelType fuelType = FuelType.valueOf(arguments.toUpperCase());
-                    storageInteraction.countLessThanFuelType(fuelType);
-                    messageToClient.append("Элементов с типом топлива, меньше указанного: ").append(storageInteraction.countLessThanFuelType(fuelType)).append("\n");
-                } else messageToClient.append("Неверно введено значение Fuel Type.\n");
-                if (ui.isInteractionMode()) {
-                    messageToClient.append("Ожидаем дальнейших инструкций от клиента.\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        return messageToClient.toString();
+        int result;
+        if (ValidationClass.validateFuelType(arguments, true, ui)) {
+            FuelType fuelType = FuelType.valueOf(arguments.toUpperCase());
+            result = storageInteraction.countLessThanFuelType(fuelType);
+        } else return ("Неверно введено значение Fuel Type.");
+        return ("Элементов с типом топлива, меньше указанного: " + result);
     }
 }

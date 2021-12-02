@@ -1,5 +1,7 @@
 package common.commands.user;
 
+import common.DataBaseCenter;
+import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
 import server.Server;
@@ -22,6 +24,7 @@ public class Exit extends Command {
         needsObject = false;
         argumentAmount = 0;
         serverCommandLabel = false;
+        editsCollection = false;
     }
 
     /**
@@ -31,7 +34,7 @@ public class Exit extends Command {
      * @return Результат команды.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         System.exit(0);
         return ("Завершение работы");
     }

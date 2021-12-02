@@ -1,5 +1,6 @@
 package common.commands.server;
 
+import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
 import server.interaction.StorageInteraction;
@@ -21,6 +22,7 @@ public class Save extends Command {
         needsObject = false;
         argumentAmount = 0;
         serverCommandLabel = true;
+        editsCollection = false;
     }
 
     /**
@@ -29,7 +31,7 @@ public class Save extends Command {
      * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction) throws IOException {
+    public String execute(UserInterface ui, StorageInteraction storageInteraction, User user) throws IOException {
         storageInteraction.save();
         return ("Коллекция сохранена в файл");
     }
