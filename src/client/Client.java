@@ -158,14 +158,14 @@ public class Client {
             cmd.setUser(user);
             cmdByte = SerializationTool.serialize(cmd);
             sendServerCommand(cmd);
-            String answer = receive();
-            if (answer.contains(" не "))
-                return false;
-            else {
-                this.user = user;
-                System.out.println("Вход успешен!");
-                return true;
-            }
+//            if (answer.contains(" не "))
+//                return false;
+//            else {
+//                this.user = user;
+//                System.out.println("Вход успешен!");
+//                return true;
+//            }
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -185,14 +185,15 @@ public class Client {
             cmd.setUser(user);
             cmdByte = SerializationTool.serialize(cmd);
             sendServerCommand(cmd);
-            String answer = receive();
-            if (answer.contains(" не "))
-                return false;
-            else {
-                this.user = user;
-                System.out.println("Вход успешен!");
-                return true;
-            }
+//            String answer = receive();
+//            if (answer.contains(" не "))
+//                return false;
+//            else {
+//                this.user = user;
+//                System.out.println("Вход успешен!");
+//                return true;
+//            }
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             return false;

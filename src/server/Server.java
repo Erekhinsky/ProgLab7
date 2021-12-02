@@ -94,14 +94,18 @@ public class Server implements Runnable {
         String argument;
         String result = null;
         Vehicle vehicle;
-        if (cmd.getCmdLine().equals("register"))
+        if (cmd.getCmdLine().equals("register")) {
             authorisation = authoriseUser(cmd.getUser(), "new");
-        if (cmd.getCmdLine().equals("login"))
-            authorisation = authoriseUser(cmd.getUser(), "old");
-        if (!cmd.getCmdLine().equals("login") && !(cmd.getCmdLine().equals("register"))) {
-            authorisation = true;
+            result = "Регистрация успешна! ";
         }
-        if (authorisation) {
+        if (cmd.getCmdLine().equals("login")) {
+            authorisation = authoriseUser(cmd.getUser(), "old");
+            result = "Авторизация успешна! ";
+        }
+//        if (!cmd.getCmdLine().equals("login")) {
+//            authorisation = true;
+//        }
+        if (!cmd.getCmdLine().equals("login") && !cmd.getCmdLine().equals("register")) {
             if (cmd.getCmdLine().equals("exit")) {
                 Command save = new Save();
                 save.setUser(cmd.getUser());
@@ -134,7 +138,7 @@ public class Server implements Runnable {
                     }
                 }
             }
-        } else result = "Авторизация не удалась";
+        }
         if (result != null) {
             return result;
         } else return "Как так получилось, что ты оказался здесь";
