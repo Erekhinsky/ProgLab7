@@ -22,6 +22,7 @@ public class Client {
     private DatagramSocket socket;
     private final UserInterface userInterface = new UserInterface(new InputStreamReader(System.in), true, new OutputStreamWriter(System.out));
     private User user = null;
+    private boolean authorise = false;
 
     public static void main(String[] args) {
         Client client = new Client();
@@ -57,30 +58,33 @@ public class Client {
     }
 
     public void run() throws IOException, IncorrectValueException, ClassNotFoundException {
-        sendServerCommand(CommandCenter.getInstance().getCmdCommand("server_info"));
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите команду: (Введите \"help\" чтобы получить информацию о командах.)");
-        String command = "";
-        while (scanner.hasNextLine() && !command.equals("exit")) {
+        while (scanner.hasNextLine()) {
             String[] input = scanner.nextLine().trim().split(" ");
-            command = input[0];
             Command cmd = CommandCenter.getInstance().getCmdCommand(input[0]);
-            if (!(cmd == null) && !cmd.getServerCommandLabel()) {
+            if (cmd.getCmdLine().equals("exit")){
+                break;
+            }
+            if (!cmd.getServerCommandLabel()) {
                 byte[] cmdByte;
                 if (cmd.getArgumentAmount() == 0) {
                     cmdByte = SerializationTool.serialize(cmd);
                     send(cmdByte);
+                    cmd.setUser(user);
                     userInterface.showMessage(receive());
                 }
                 if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
                     cmd.setObject(userInterface.readVehicle(userInterface));
+                    cmd.setUser(user);
                     cmdByte = SerializationTool.serialize(cmd);
                     send(cmdByte);
                     userInterface.showMessage(receive());
                 }
                 if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
                     cmd.setArgument(userInterface.readArgument("Введите " + cmd.getOptions(), false));
+                    cmd.setUser(user);
                     cmdByte = SerializationTool.serialize(cmd);
                     send(cmdByte);
                     userInterface.showMessage(receive());
@@ -89,6 +93,7 @@ public class Client {
                     cmd.setArgument(userInterface.readArgument("Введите " + cmd.getOptions(), false));
                     Vehicle vehicle = userInterface.readVehicle(userInterface);
                     cmd.setObject(vehicle);
+                    cmd.setUser(user);
                     cmdByte = SerializationTool.serialize(cmd);
                     send(cmdByte);
                     userInterface.showMessage(receive());
@@ -138,7 +143,7 @@ public class Client {
     }
 
     public boolean authorisation() throws IOException {
-        String action = userInterface.readArgument("Здравствуйте! Введите login, если вы уже зарегистрированы. В ином случае, введите register.", false);
+        String action = userInterface.readArgument("Введите login, если вы уже зарегистрированы. В ином случае, введите register.", false);
         if (action.equals("login")) {
             return login();
         } else {
@@ -149,23 +154,11 @@ public class Client {
     }
 
     public boolean login() {
-        byte[] cmdByte;
         try {
             String login = userInterface.readArgument("Введите ваш логин:", false);
             String password = getHexString(userInterface.readArgument("Введите пароль: ", false));
             Command cmd = new Login();
-            User user = new User(login, password);
-            cmd.setUser(user);
-            cmdByte = SerializationTool.serialize(cmd);
-            sendServerCommand(cmd);
-//            if (answer.contains(" не "))
-//                return false;
-//            else {
-//                this.user = user;
-//                System.out.println("Вход успешен!");
-//                return true;
-//            }
-            return true;
+            return sendAuthorise(login, password, cmd);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -174,26 +167,13 @@ public class Client {
 
     public boolean register() {
         try {
-            byte[] cmdByte;
             String login = userInterface.readArgument("Придумайте логин:", false);
             String password = "";
             do {
                 password = getHexString(userInterface.readArgument("Введите пароль", false));
             } while (password.isEmpty());
             Command cmd = new Register();
-            User user = new User(login, password);
-            cmd.setUser(user);
-            cmdByte = SerializationTool.serialize(cmd);
-            sendServerCommand(cmd);
-//            String answer = receive();
-//            if (answer.contains(" не "))
-//                return false;
-//            else {
-//                this.user = user;
-//                System.out.println("Вход успешен!");
-//                return true;
-//            }
-            return true;
+            return sendAuthorise(login, password, cmd);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -205,6 +185,27 @@ public class Client {
         cmdByte = SerializationTool.serialize(cmd);
         DatagramPacket packet = new DatagramPacket(Objects.requireNonNull(cmdByte), cmdByte.length, address);
         socket.send(packet);
-        userInterface.showMessage(receive());
+    }
+
+    public void sendServerCommand(String cmd) throws IOException {
+        byte[] cmdByte;
+        cmdByte = SerializationTool.serialize(cmd);
+        DatagramPacket packet = new DatagramPacket(Objects.requireNonNull(cmdByte), cmdByte.length, address);
+        socket.send(packet);
+    }
+
+    public boolean sendAuthorise(String login, String password, Command cmd) throws IOException {
+        user = new User(login, password);
+        cmd.setUser(user);
+        sendServerCommand(cmd);
+        String answer = receive();
+        if (answer.contains(" не ")) {
+            userInterface.showMessage(answer);
+            return false;
+        }
+        else {
+            userInterface.showMessage(answer);
+            return true;
+        }
     }
 }

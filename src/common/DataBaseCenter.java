@@ -12,9 +12,7 @@ import java.util.Vector;
 
 public class DataBaseCenter {
     private final String URL = "jdbc:postgresql://localhost:5432/postgres";
-    private String user = "postgres";
-    //    private final String URL = "jdbc:postgresql://pg:5432/studs";
-    //    private final String user = "s311774";
+    private final String user = "postgres";
     private String password = "ykh666";
 
     public DataBaseCenter() {
@@ -45,6 +43,7 @@ public class DataBaseCenter {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
             while (resultSet.next()) {
                 if (resultSet.getString("username").equals(loggingUser.getLogin()) && resultSet.getString("password").equals(loggingUser.getPassword())) {
+                    System.out.println("Вход успешен - DBC");
                     return true;
                 }
             }

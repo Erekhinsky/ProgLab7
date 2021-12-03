@@ -59,12 +59,12 @@ public interface CommandInterface {
      */
     void clear();
 
-    /**
-     * Команда save.
-     *
-     * @throws IOException В случае ошибки.
-     */
-    void save() throws IOException;
+//    /**
+//     * Команда save.
+//     *
+//     * @throws IOException В случае ошибки.
+//     */
+//    void save() throws IOException;
 
     /**
      * Команда exit.

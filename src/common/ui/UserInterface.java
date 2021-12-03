@@ -100,7 +100,6 @@ public class UserInterface {
         if (!nullable) {
             if (interaction) {
                 while (line == null) {
-                    showMessage("Введите: ");
                     showMessage(message);
                     line = scanner.nextLine();
                     line = line.isEmpty() ? null : line;
@@ -176,7 +175,7 @@ public class UserInterface {
 
         String name;
         do {
-            name = readArgument("Название транспорта: ", false);
+            name = readArgument("Введите название транспорта: ", false);
         }
         while (!ValidationClass.validateName(name, interaction, ui));
 
@@ -185,10 +184,10 @@ public class UserInterface {
         String xLine;
         String yLine;
         do {
-            xLine = readArgument("x координату:", false);
+            xLine = readArgument("Введите x координату:", false);
         } while (!ValidationClass.validateDouble(xLine, interaction, ui, false));
         do {
-            yLine = readArgument("y координату:", false);
+            yLine = readArgument("Введите y координату:", false);
         } while (!ValidationClass.validateDouble(yLine, interaction, ui, false));
         double x = Double.parseDouble(xLine);
         double y = Double.parseDouble(yLine);
@@ -196,26 +195,26 @@ public class UserInterface {
 
         String enginePowerStr;
         do {
-            enginePowerStr = readConditionArgument("Мощность двигателя:", 0, Double.MAX_VALUE, false);
+            enginePowerStr = readConditionArgument("Введите Мощность двигателя:", 0, Double.MAX_VALUE, false);
         } while (!ValidationClass.validateLong(enginePowerStr, interaction, ui, false));
         long enginePower = Long.parseLong(enginePowerStr);
 
         String numberOfWheelsStr;
         do {
-            numberOfWheelsStr = readConditionArgument("Количество колес:", 0, Double.MAX_VALUE, true);
+            numberOfWheelsStr = readConditionArgument("Введите Количество колес:", 0, Double.MAX_VALUE, true);
         } while (!ValidationClass.validateLong(numberOfWheelsStr, interaction, ui, false));
         long numberOfWheels = Long.parseLong(numberOfWheelsStr);
 
         String distanceTravelledStr;
         do {
-            distanceTravelledStr = readConditionArgument("Пройденную дистанцию: ", 0, Float.MAX_VALUE, false);
+            distanceTravelledStr = readConditionArgument("Введите Пройденную дистанцию: ", 0, Float.MAX_VALUE, false);
         } while (!ValidationClass.validateFloat(distanceTravelledStr, interaction, ui, true));
         float distanceTravelled = Float.parseFloat(distanceTravelledStr);
 
         FuelType fuelType;
         String fuelTypeLine;
         do {
-            fuelTypeLine = readArgument("Тип топлива, выберите из этих:" + "\n" + FuelType.getPossibleValues(), false);
+            fuelTypeLine = readArgument("Введите Тип топлива, выберите из этих:" + "\n" + FuelType.getPossibleValues(), false);
         } while (!ValidationClass.validateFuelType(fuelTypeLine, interaction, ui));
         fuelType = FuelType.valueOf(fuelTypeLine.toUpperCase());
 

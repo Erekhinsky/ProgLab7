@@ -6,14 +6,12 @@ import common.User;
 import common.commands.abstracts.Command;
 import common.commands.server.Login;
 import common.commands.server.Register;
-import common.commands.server.Save;
 import common.elementsOfCollection.Vehicle;
 import common.exception.IncorrectValueException;
 import common.ui.CommandCenter;
 import common.ui.UserInterface;
 import server.collection.VehicleStorage;
 import server.interaction.StorageInteraction;
-import server.utils.FileHelper;
 
 import java.io.*;
 import java.net.*;
@@ -22,6 +20,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.sql.SQLException;
+import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
@@ -40,18 +39,13 @@ public class Server implements Runnable {
     public DatagramChannel datagramChannel;
     private Selector selector;
 
-    private static StringBuilder stringMessage = new StringBuilder();
+    private static final StringBuilder stringMessage = new StringBuilder();
     private static boolean firstOpen = true;
-    private boolean authorisation = false;
+    boolean authorise = false;
 
-    private static ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
     ForkJoinPool forkJoinPool = new ForkJoinPool();
     private DataBaseCenter dbc = new DataBaseCenter();
-
-    public static ExecutorService getExecutorService() {
-        return executorService;
-    }
-
 
     public Server(DataBaseCenter dataBaseCenter) {
         int PORT = 8725;
@@ -95,53 +89,45 @@ public class Server implements Runnable {
         String result = null;
         Vehicle vehicle;
         if (cmd.getCmdLine().equals("register")) {
-            authorisation = authoriseUser(cmd.getUser(), "new");
-            result = "Регистрация успешна! ";
+            authorise = authoriseUser(cmd.getUser(), "new");
+            if (authorise) result = "Регистрация успешна!";
+            else result = "Регистрация не удалась\n";
         }
         if (cmd.getCmdLine().equals("login")) {
-            authorisation = authoriseUser(cmd.getUser(), "old");
-            result = "Авторизация успешна! ";
+            authorise = authoriseUser(cmd.getUser(), "old");
+            if (authorise) result = "Авторизация успешна!";
+            else result = "Авторизация не удалась\n" + "";
         }
-//        if (!cmd.getCmdLine().equals("login")) {
-//            authorisation = true;
-//        }
-        if (!cmd.getCmdLine().equals("login") && !cmd.getCmdLine().equals("register")) {
-            if (cmd.getCmdLine().equals("exit")) {
-                Command save = new Save();
-                save.setUser(cmd.getUser());
-                logger.log(Level.INFO, "Начато сохранение коллекции" + "\n");
-                result = CommandCenter.getInstance().executeCommand(userInterface, save, storageInteraction, dbc);
+        if (!cmd.getCmdLine().equals("login") && !cmd.getCmdLine().equals("register") && authorise) {
+            if (cmd.getServerCommandLabel()) {
+                logger.log(Level.INFO, "Выполнение серверной команды - " + cmd.getCmdLine() + "\n");
+                result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction);
             } else {
-                if (cmd.getServerCommandLabel()) {
-                    logger.log(Level.INFO, "Выполнение серверной команды - " + cmd.getCmdLine() + "\n");
-                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction);
-                } else {
-                    if (cmd.getArgumentAmount() == 0) {
-                        logger.log(Level.INFO, "Выполнение команды без аргументов - " + cmd.getCmdLine() + "\n");
-                        result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, dbc) + "\nВведите команду:";
-                    }
-                    if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
-                        logger.log(Level.INFO, "Выполнение команды с аргументом - " + cmd.getCmdLine() + "\n");
-                        argument = cmd.getArgument();
-                        result = CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, dbc) + "\nВведите команду:";
-                    }
-                    if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
-                        logger.log(Level.INFO, "Выполнение команды с аргументом-объектом - " + cmd.getCmdLine() + "\n");
-                        vehicle = cmd.getObject();
-                        result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle, dbc) + "\nВведите команду:";
-                    }
-                    if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
-                        logger.log(Level.INFO, "Выполнение команды с аргументом и аргументом-объектом - " + cmd.getCmdLine() + "\n");
-                        argument = cmd.getArgument();
-                        vehicle = cmd.getObject();
-                        result = CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle, dbc) + "\nВведите команду:";
-                    }
+                if (cmd.getArgumentAmount() == 0) {
+                    logger.log(Level.INFO, "Выполнение команды без аргументов - " + cmd.getCmdLine() + "\n");
+                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, dbc) + "\nВведите команду:";
+                }
+                if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
+                    logger.log(Level.INFO, "Выполнение команды с аргументом - " + cmd.getCmdLine() + "\n");
+                    argument = cmd.getArgument();
+                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, dbc) + "\nВведите команду:";
+                }
+                if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
+                    logger.log(Level.INFO, "Выполнение команды с аргументом-объектом - " + cmd.getCmdLine() + "\n");
+                    vehicle = cmd.getObject();
+                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle, dbc) + "\nВведите команду:";
+                }
+                if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
+                    logger.log(Level.INFO, "Выполнение команды с аргументом и аргументом-объектом - " + cmd.getCmdLine() + "\n");
+                    argument = cmd.getArgument();
+                    vehicle = cmd.getObject();
+                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle, dbc) + "\nВведите команду:";
                 }
             }
         }
         if (result != null) {
             return result;
-        } else return "Как так получилось, что ты оказался здесь";
+        } else return "Вы не авторизованы. Работа с базой данных невозможна.";
     }
 
     public void sendAnswer(String str) throws IOException {
@@ -151,29 +137,29 @@ public class Server implements Runnable {
     }
 
     public void run() {
-        String path = "jsonFile.txt";
         try {
-            System.getenv().get(path);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Файла нет.");
-            path = null;
-            System.exit(0);
-        }
-
-        try {
-            storageInteraction = new StorageInteraction(vehicleStorage, path);
-            FileHelper.readFile(path, storageInteraction);
-
-            dbc.createTable();
-            dbc.retrieveCollectionFromDB(storageInteraction);
-
+            storageInteraction = new StorageInteraction(vehicleStorage);
+            try {
+                logger.log(Level.INFO, "Чтение коллекции из базы данных" + "\n");
+                dbc.createTable();
+                dbc.retrieveCollectionFromDB(storageInteraction);
+            } catch (NullPointerException e) {
+                logger.log(Level.SEVERE, "Данные недействительны" + "\n", e);
+                System.exit(-1);
+            } catch (DateTimeParseException e) {
+                logger.log(Level.SEVERE, "Форматирование даты недопустимо" + "\n", e);
+                System.exit(-1);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                logger.log(Level.SEVERE, "Недостаточно аргументов" + "\n", e);
+                System.exit(-1);
+            } catch (IllegalArgumentException e) {
+                logger.log(Level.SEVERE, "Недействительные аргументы" + "\n", e);
+                System.exit(-1);
+            }
+            logger.log(Level.INFO, "Коллекция успешно прочитана" + "\n");
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                Server.logger.log(Level.INFO, "Сохранение коллекции." + "\n");
-                try {
-                    CommandCenter.getInstance().executeCommand(userInterface, new Save(), storageInteraction);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Server.logger.log(Level.INFO, "ВСЕМ ББ" + "\n");
+                System.exit(-1);
             }));
 
             openChannel();
@@ -196,48 +182,43 @@ public class Server implements Runnable {
                         datagramChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                     }
                     if (key.isWritable()) {
-                        if (stringMessage != null){
+                        if (stringMessage != null) {
 
                             Command cmd = forkJoinPool.invoke(new TaskForRequest(this));
 
-                            Future<String> executor = executorService.submit(()->{
+                            Future<String> executor = executorService.submit(() -> {
                                 try {
-                                    String cmdString = executeCommand(cmd);
-                                    System.out.println(cmdString);
-                                    return cmdString;
+                                    return executeCommand(cmd);
                                 } catch (IOException | IncorrectValueException e) {
                                     e.printStackTrace();
-                                } return null;
+                                }
+                                return null;
                             });
 
                             String commandResult = executor.get();
-                            System.out.println(commandResult + " :::: ");
 
                             executorService.submit(() -> {
                                 try {
-                                    System.out.println("SM + CM =: \n");
                                     sendAnswer(stringMessage + "\n" + commandResult);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                             });
+                            setStringMessage(null);
+                        } else {
 
-                            stringMessage = null;
-
-                        }
-                        else {
                             Command cmd = forkJoinPool.invoke(new TaskForRequest(this));
 
-                            Future<String> executor = executorService.submit(()->{
+                            Future<String> executor = executorService.submit(() -> {
                                 try {
                                     return executeCommand(cmd);
                                 } catch (IOException | IncorrectValueException e) {
                                     e.printStackTrace();
-                                } return null;
+                                }
+                                return null;
                             });
 
                             String commandResult = executor.get();
-                            System.out.println(commandResult + " :::: ");
 
                             executorService.submit(() -> {
                                 try {
@@ -252,16 +233,14 @@ public class Server implements Runnable {
                     keyIterator.remove();
                 }
             }
-        } catch (IllegalArgumentException e) {
-            logger.log(Level.SEVERE, "В окружении нет файла с коллекцией: jsonFile.txt" + "\n");
         } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage()+ "\n");
+            logger.log(Level.SEVERE, e.getMessage() + "\n");
         }
     }
 
-    public static void setStringMessage(String sm) {
-        if (sm != null){
-            stringMessage.append(sm);
+    public static void setStringMessage(String stringMessage1) {
+        if (stringMessage1 != null) {
+            stringMessage.append(stringMessage1);
         }
     }
 
@@ -273,21 +252,21 @@ public class Server implements Runnable {
         if (existence.equals("new")) {
             if (dbc.addUser(user)) {
                 CommandCenter.getInstance().executeCommand(userInterface, new Register(), storageInteraction);
-                System.out.println(user.getLogin() + " " + "REG success");
+                logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Register success" + "\n");
                 return true;
             } else {
                 CommandCenter.getInstance().executeCommand(userInterface, new Register(), storageInteraction);
-                System.out.println(user.getLogin() + " " + "REG fail");
+                logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Register fail" + "\n");
                 return false;
             }
         } else {
             if (dbc.loginUser(user)) {
                 CommandCenter.getInstance().executeCommand(userInterface, new Login(), storageInteraction);
-                System.out.println(user.getLogin() + " " + "LOG success");
+                logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Login success" + "\n");
                 return true;
             } else {
                 CommandCenter.getInstance().executeCommand(userInterface, new Login(), storageInteraction);
-                System.out.println(user.getLogin() + " " + "LOG fail");
+                logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Login fail" + "\n");
                 return false;
             }
         }

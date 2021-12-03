@@ -27,11 +27,10 @@ public final class StorageInteraction implements CommandInterface {
 
     /**
      * Стандартный конструктор, задает хранилище, с которым будет работа.
+     *  @param storage    хранилище.
      *
-     * @param storage    хранилище.
-     * @param originPath путь к файлу.
      */
-    public StorageInteraction(VehicleStorage storage, String originPath) {
+    public StorageInteraction(VehicleStorage storage) {
         StorageInteraction.storage = storage;
         StorageInteraction.originPath = originPath;
     }
@@ -120,41 +119,41 @@ public final class StorageInteraction implements CommandInterface {
         storage.clear();
     }
 
-    /**
-     * Метод, реализующий команду save.
-     *
-     * @throws IOException В случае ошибки ввода/вывода.
-     */
-    public void save() throws IOException {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        BufferedWriter bufferedWriter = new BufferedWriter(new PrintWriter(StorageInteraction.originPath));
-        bufferedWriter.write("{" + "\n");
-        bufferedWriter.write("\t" + "\"vehicle\" : [" + "\n");
-        int counter = 0;
-        for (Vehicle v : storage.getCollection()) {
-            bufferedWriter.write("\t" + "\t" + "{" + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"id\": " + "\"" + v.getId() + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"name\": " + "\"" + v.getName() + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"coordinates\": { " + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\t" + "\"x\": " + "\"" + v.getX() + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\t" + "\"y\": " + "\"" + v.getY() + "\"" + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "}," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"creationDate\": " + "\"" + v.getCreationDate().format(formatter) + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"enginePower\": " + "\"" + v.getEnginePower() + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"numberOfWheels\": " + "\"" + v.getNumberOfWheels() + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"distanceTravelled\": " + "\"" + v.getDistanceTravelled() + "\"," + "\n");
-            bufferedWriter.write("\t" + "\t" + "\t" + "\"fuelType\": " + "\"" + v.getFuelType() + "\"" + "\n");
-            if (counter == storage.getCollection().size() - 1) {
-                bufferedWriter.write("\t" + "\t" + "}" + "\n");
-            } else bufferedWriter.write("\t" + "\t" + "}," + "\n");
-            counter++;
-        }
-        bufferedWriter.write("\t" + "]" + "\n");
-        bufferedWriter.write("}" + "\n");
-        bufferedWriter.flush();
-    }
+//    /**
+//     * Метод, реализующий команду save.
+//     *
+//     * @throws IOException В случае ошибки ввода/вывода.
+//     */
+//    public void save() throws IOException {
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//
+//        BufferedWriter bufferedWriter = new BufferedWriter(new PrintWriter(StorageInteraction.originPath));
+//        bufferedWriter.write("{" + "\n");
+//        bufferedWriter.write("\t" + "\"vehicle\" : [" + "\n");
+//        int counter = 0;
+//        for (Vehicle v : storage.getCollection()) {
+//            bufferedWriter.write("\t" + "\t" + "{" + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"id\": " + "\"" + v.getId() + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"name\": " + "\"" + v.getName() + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"coordinates\": { " + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\t" + "\"x\": " + "\"" + v.getX() + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\t" + "\"y\": " + "\"" + v.getY() + "\"" + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "}," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"creationDate\": " + "\"" + v.getCreationDate().format(formatter) + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"enginePower\": " + "\"" + v.getEnginePower() + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"numberOfWheels\": " + "\"" + v.getNumberOfWheels() + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"distanceTravelled\": " + "\"" + v.getDistanceTravelled() + "\"," + "\n");
+//            bufferedWriter.write("\t" + "\t" + "\t" + "\"fuelType\": " + "\"" + v.getFuelType() + "\"" + "\n");
+//            if (counter == storage.getCollection().size() - 1) {
+//                bufferedWriter.write("\t" + "\t" + "}" + "\n");
+//            } else bufferedWriter.write("\t" + "\t" + "}," + "\n");
+//            counter++;
+//        }
+//        bufferedWriter.write("\t" + "]" + "\n");
+//        bufferedWriter.write("}" + "\n");
+//        bufferedWriter.flush();
+//    }
 
     /**
      * Метод, реализующий команду exit.
@@ -294,7 +293,6 @@ public final class StorageInteraction implements CommandInterface {
     }
 
     public void close() throws IOException {
-        save();
         System.exit(0);
     }
 
