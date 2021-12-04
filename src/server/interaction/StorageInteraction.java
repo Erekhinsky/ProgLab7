@@ -1,12 +1,10 @@
 package server.interaction;
 
-import server.Server;
 import server.collection.VehicleStorage;
 import common.elementsOfCollection.*;
 import common.exception.IncorrectValueException;
 
 import java.io.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -119,42 +117,6 @@ public final class StorageInteraction implements CommandInterface {
         storage.clear();
     }
 
-//    /**
-//     * Метод, реализующий команду save.
-//     *
-//     * @throws IOException В случае ошибки ввода/вывода.
-//     */
-//    public void save() throws IOException {
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//
-//        BufferedWriter bufferedWriter = new BufferedWriter(new PrintWriter(StorageInteraction.originPath));
-//        bufferedWriter.write("{" + "\n");
-//        bufferedWriter.write("\t" + "\"vehicle\" : [" + "\n");
-//        int counter = 0;
-//        for (Vehicle v : storage.getCollection()) {
-//            bufferedWriter.write("\t" + "\t" + "{" + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"id\": " + "\"" + v.getId() + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"name\": " + "\"" + v.getName() + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"coordinates\": { " + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\t" + "\"x\": " + "\"" + v.getX() + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\t" + "\"y\": " + "\"" + v.getY() + "\"" + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "}," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"creationDate\": " + "\"" + v.getCreationDate().format(formatter) + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"enginePower\": " + "\"" + v.getEnginePower() + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"numberOfWheels\": " + "\"" + v.getNumberOfWheels() + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"distanceTravelled\": " + "\"" + v.getDistanceTravelled() + "\"," + "\n");
-//            bufferedWriter.write("\t" + "\t" + "\t" + "\"fuelType\": " + "\"" + v.getFuelType() + "\"" + "\n");
-//            if (counter == storage.getCollection().size() - 1) {
-//                bufferedWriter.write("\t" + "\t" + "}" + "\n");
-//            } else bufferedWriter.write("\t" + "\t" + "}," + "\n");
-//            counter++;
-//        }
-//        bufferedWriter.write("\t" + "]" + "\n");
-//        bufferedWriter.write("}" + "\n");
-//        bufferedWriter.flush();
-//    }
-
     /**
      * Метод, реализующий команду exit.
      */
@@ -166,8 +128,10 @@ public final class StorageInteraction implements CommandInterface {
      * Метод, реализующий команду remove_first.
      */
     @Override
-    public void removeFirst() {
+    public long removeFirst() {
+        long id = storage.getCollection().get(0).getId();
         storage.getCollection().remove(0);
+        return id;
     }
 
     /**
@@ -176,7 +140,7 @@ public final class StorageInteraction implements CommandInterface {
      * @param vehicle Объект сравнения.
      */
     @Override
-    public void removeLower(Vehicle vehicle) {
+    public List<Long> removeLower(Vehicle vehicle) {
         Vector<Vehicle> vehicles = storage.getCollection();
         List<Vehicle> toBeSortedVehicles = new ArrayList<>(vehicles);
         toBeSortedVehicles.sort(Comparator.comparing(Vehicle::getEnginePower));
@@ -185,7 +149,11 @@ public final class StorageInteraction implements CommandInterface {
                 collect(Collectors.toList());
         toBeRemovedVehicles.
                 forEach(vehicle1 -> storage.getCollection().remove(vehicle1));
+        List<Long> idRemoved = new ArrayList<>();
+        toBeRemovedVehicles.forEach(v -> idRemoved.add(v.getId()));
+        return idRemoved;
     }
+
 
     /**
      * Метод, реализующий команду add_if_max.

@@ -1,13 +1,12 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.elementsOfCollection.Vehicle;
 import common.exception.IncorrectValueException;
 import common.ui.CommandCenter;
 import common.ui.UserInterface;
-import server.Server;
 import server.interaction.StorageInteraction;
 
 import java.io.*;
@@ -36,16 +35,15 @@ public class ExecuteScript extends Command {
         needsObject = false;
         argumentAmount = 1;
         serverCommandLabel = false;
-        editsCollection = false;
+        editsCollection = true;
     }
 
     /**
      * Метод исполнения
      *
-     * @param ui        объект, через который ведется взаимодействие с пользователем.
      * @param arguments необходимые для исполнения аргументы.
      */
-    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction storageInteraction, String arguments, DataBaseCenter dbc, User user) throws IOException {
 
         UserInterface scriptInteraction = new UserInterface(new FileReader(arguments), false, new OutputStreamWriter(System.out));
 
@@ -61,49 +59,50 @@ public class ExecuteScript extends Command {
                 while (scriptInteraction.hasNextLine()) {
                     line = scriptInteraction.read();
                     String cmdLine = line.split(" ")[0];
-                    String cmdArgument;
-                    try {
-                        cmdArgument = line.split(" ")[1];
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        cmdArgument = null;
-                    }
-                    Command cmd = CommandCenter.getInstance().getCmdCommand(cmdLine);
-                    if (cmd.getClass().toString().contains(".Login") || cmd.getClass().toString().contains(".Register"))
-                        throw new InvalidParameterException();
-                    cmd.setUser(user);
-                    if (cmd != null) {
+                    if (!CommandCenter.getInstance().receiveAllStringCommands().contains(cmdLine)) {
+                    } else {
+                        String cmdArgument;
+                        try {
+                            cmdArgument = line.split(" ")[1];
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            cmdArgument = null;
+                        }
+                        Command cmd = CommandCenter.getInstance().getCmdCommand(cmdLine);
+                        if (cmd.getClass().toString().contains(".Login") || cmd.getClass().toString().contains(".Register"))
+                            throw new InvalidParameterException();
+                        cmd.setUser(user);
                         if (cmd.getArgumentAmount() == 0) {
-                            result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, storageInteraction, dbc)).append("\n");
+                            result.append(CommandCenter.getInstance().executeCommand(cmd, storageInteraction, dbc)).append("\n");
                         } else {
                             if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
                                 Vehicle vehicle = scriptInteraction.readVehicle(scriptInteraction);
-                                result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, storageInteraction, vehicle, dbc)).append("\n");
+                                result.append(CommandCenter.getInstance().executeCommand(cmd, storageInteraction, vehicle, dbc)).append("\n");
                             }
                             if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
                                 if (cmd.getCmdLine().equals("execute_script")) {
                                     paths.forEach(System.out::println);
                                     if (!paths.contains(cmdArgument)) {
                                         paths.add(cmdArgument);
-                                        result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, dbc)).append("\n");
+                                        result.append(CommandCenter.getInstance().executeCommand(cmd, cmdArgument, storageInteraction, dbc)).append("\n");
                                     } else {
                                         paths.clear();
                                         throw new InvalidAlgorithmParameterException("Выполнение скрипта остановлено, т.к. возможна рекурсия");
                                     }
                                 } else
-                                    result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, dbc)).append("\n");
+                                    result.append(CommandCenter.getInstance().executeCommand(cmd, cmdArgument, storageInteraction, dbc)).append("\n");
                             }
                             if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
                                 Vehicle vehicle = scriptInteraction.readVehicle(scriptInteraction);
-                                result.append(CommandCenter.getInstance().executeCommand(scriptInteraction, cmd, cmdArgument, storageInteraction, vehicle, dbc)).append("\n");
+                                result.append(CommandCenter.getInstance().executeCommand(cmd, cmdArgument, storageInteraction, vehicle, dbc)).append("\n");
                             }
                         }
-                    } else result.append("Команда в скрипте: ").append(cmdLine).append(" не является командой\n");
+                    }
                 }
                 paths.clear();
                 result.append("Скрипт выполнен");
-                return result.toString();
             } else result.append("Скрипт не выполнен, что-то не так с файлом.");
-                return result.toString();
+            System.out.println("Я выполнился");
+            return result.toString();
         } catch (InvalidParameterException e) {
             paths.clear();
             result.append("Неверный скрипт");
@@ -122,6 +121,6 @@ public class ExecuteScript extends Command {
         } catch (IncorrectValueException e) {
             e.printStackTrace();
         }
-        return null;
+        return result.toString();
     }
 }

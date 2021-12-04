@@ -1,6 +1,6 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
@@ -31,7 +31,7 @@ public class Update extends Command {
      * @param argument           необходимые для исполнения аргументы.
      * @param storageInteraction объект для взаимодействия с коллекцией.
      */
-    public String execute(UserInterface userInterface, StorageInteraction storageInteraction, String argument,
+    public String execute(StorageInteraction storageInteraction, String argument,
                           Vehicle vehicle, DataBaseCenter dataBaseCenter, User user) {
         long id = Long.parseLong(argument);
         if (storageInteraction.findById(id) && dataBaseCenter.updateVehicle(vehicle, id, user)) {

@@ -1,5 +1,6 @@
 package common.elementsOfCollection;
 
+import common.User;
 import server.collection.VehicleStorage;
 import common.exception.IncorrectValueException;
 
@@ -52,6 +53,8 @@ public class Vehicle implements Serializable {
      * Тип топлива транспорта. Поле может быть null.
      */
     private FuelType fuelType;
+
+    private User user;
 
 
     /**
@@ -340,4 +343,11 @@ public class Vehicle implements Serializable {
         return (int) (this.getId() - vehicle.getId());
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

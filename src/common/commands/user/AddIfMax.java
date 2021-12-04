@@ -1,12 +1,11 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.exception.IncorrectValueException;
 import common.ui.UserInterface;
 import common.elementsOfCollection.Vehicle;
-import server.Server;
 import server.interaction.StorageInteraction;
 
 /**
@@ -29,11 +28,9 @@ public class AddIfMax extends Command {
 
     /**
      * Метод исполнения
-     *
-     * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) throws IncorrectValueException {
+    public String execute(StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) throws IncorrectValueException {
         int size1 = storageInteraction.getSize();
         storageInteraction.addIfMax(vehicle);
         int size2 = storageInteraction.getSize();

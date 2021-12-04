@@ -1,6 +1,6 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
@@ -28,10 +28,8 @@ public class PrintFieldDescendingDistanceTravelled extends Command {
 
     /**
      * Метод исполнения
-     *
-     * @param ui объект, через который ведется взаимодействие с пользователем.
      */
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
+    public String execute(StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         return storageInteraction.printFieldDescendingDistanceTravelled().listIterator().next().toString();
     }
 }

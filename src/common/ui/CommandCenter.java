@@ -1,6 +1,6 @@
 package common.ui;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.commands.abstracts.Command;
 import common.commands.server.Login;
 import common.commands.server.Register;
@@ -12,6 +12,7 @@ import server.Server;
 import server.interaction.StorageInteraction;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -60,7 +61,6 @@ public class CommandCenter {
         addCmd(new RemoveById());
         addCmd(new PrintFieldDescendingDistanceTravelled());
 
-//        addCmd(new Save());
         addCmd(new ServerInfo());
         addCmd(new Login());
         addCmd(new Register());
@@ -105,84 +105,48 @@ public class CommandCenter {
         return commands.keySet().stream().map(commands::get).collect(Collectors.toList());
     }
 
+    public List<String> receiveAllStringCommands() {
+        return new ArrayList<>(commands.keySet());
+    }
+
 
     /**
      * Методы исполнения команды.
-     *
-     * @param ui Объект взаимодействия с пользователем.
      */
-    public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction) throws IOException {
+    public String executeCommand(Command cmd, StorageInteraction storageInteraction) throws IOException {
         logger.log(Level.INFO, "Executing server command" + "\n");
-        return cmd.execute(ui, storageInteraction, cmd.getUser());
+        return cmd.execute(storageInteraction, cmd.getUser());
     }
 
-    public String  executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
+    public String executeCommand(Command cmd, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with no arguments" + "\n");
-        String result = cmd.execute(ui, storageInteraction, dataBaseCenter, cmd.getUser());
+        String result = cmd.execute(storageInteraction, dataBaseCenter, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
         return result;
     }
 
-    public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
+    public String executeCommand(Command cmd, String argument, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with a string argument" + "\n");
-        String result = cmd.execute(ui, storageInteraction, argument, dataBaseCenter, cmd.getUser());
+        String result = cmd.execute(storageInteraction, argument, dataBaseCenter, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
         return result;
     }
 
-    public String executeCommand(UserInterface ui, Command cmd, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IncorrectValueException, IOException {
+    public String executeCommand(Command cmd, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IncorrectValueException, IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with an object argument" + "\n");
-        String result = cmd.execute(ui, storageInteraction, vehicle, dbc, cmd.getUser());
+        String result = cmd.execute(storageInteraction, vehicle, dbc, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
         return result;
     }
 
-    public String executeCommand(UserInterface ui, Command cmd, String argument, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IOException {
+    public String executeCommand(Command cmd, String argument, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc) throws IOException {
         collectionLock.lock();
         logger.log(Level.INFO, "Executing user command with two arguments" + "\n");
-        String result = cmd.execute(ui, storageInteraction, argument, vehicle, dbc, cmd.getUser());
+        String result = cmd.execute(storageInteraction, argument, vehicle, dbc, cmd.getUser());
         if (collectionLock.isLocked()) collectionLock.unlock();
         return result;
     }
-
-//    public String executeCommand(UserInterface ui, Command cmd, boolean success, DataBaseCenter dbc) {
-//        collectionLock.lock();
-//        logger.log(Level.INFO, "Executing user command with two string arguments");
-//        String result = cmd.execute(ui, success);
-//        if (collectionLock.isLocked()) collectionLock.unlock();
-//        return result;
-//    }
-
-//    public String executeCommand(Command cmd) {
-//        if (cmd.getServerCommandLabel()) {
-//
-//        }
-//        if (cmd.getNeedsObject()) {
-//
-//        }
-//        if (cmd.isEditsCollection()) {
-//
-//        }
-//        if (cmd.getArgumentAmount() == 0) {
-//            if (cmd.getNeedsObject()) {
-//
-//            } else {
-//
-//            }
-//        }
-//        else if (cmd.getNeedsObject()) {
-//
-//        } else {
-//
-//        }
-//        if (cmd.getUser() != null) {
-//
-//        }
-//        if (cmd.getNeedsObject())
-//        String result = cmd.execute();
-//        return result;
-//    }
 }

@@ -18,8 +18,6 @@ import java.util.logging.Logger;
  */
 public class UserInterface {
 
-    private static final Logger logger = Logger.getLogger(Server.class.getName());
-
     /**
      * Сканер.
      */
@@ -177,7 +175,7 @@ public class UserInterface {
         do {
             name = readArgument("Введите название транспорта: ", false);
         }
-        while (!ValidationClass.validateName(name, interaction, ui));
+        while (!ValidationClass.validateName(name, interaction));
 
         LocalDate creationDate = LocalDate.now();
 
@@ -185,10 +183,10 @@ public class UserInterface {
         String yLine;
         do {
             xLine = readArgument("Введите x координату:", false);
-        } while (!ValidationClass.validateDouble(xLine, interaction, ui, false));
+        } while (!ValidationClass.validateDouble(xLine, interaction, false));
         do {
             yLine = readArgument("Введите y координату:", false);
-        } while (!ValidationClass.validateDouble(yLine, interaction, ui, false));
+        } while (!ValidationClass.validateDouble(yLine, interaction, false));
         double x = Double.parseDouble(xLine);
         double y = Double.parseDouble(yLine);
         Coordinates coordinates = new Coordinates(x, y);
@@ -196,33 +194,29 @@ public class UserInterface {
         String enginePowerStr;
         do {
             enginePowerStr = readConditionArgument("Введите Мощность двигателя:", 0, Double.MAX_VALUE, false);
-        } while (!ValidationClass.validateLong(enginePowerStr, interaction, ui, false));
+        } while (!ValidationClass.validateLong(enginePowerStr, interaction, false));
         long enginePower = Long.parseLong(enginePowerStr);
 
         String numberOfWheelsStr;
         do {
             numberOfWheelsStr = readConditionArgument("Введите Количество колес:", 0, Double.MAX_VALUE, true);
-        } while (!ValidationClass.validateLong(numberOfWheelsStr, interaction, ui, false));
+        } while (!ValidationClass.validateLong(numberOfWheelsStr, interaction, false));
         long numberOfWheels = Long.parseLong(numberOfWheelsStr);
 
         String distanceTravelledStr;
         do {
             distanceTravelledStr = readConditionArgument("Введите Пройденную дистанцию: ", 0, Float.MAX_VALUE, false);
-        } while (!ValidationClass.validateFloat(distanceTravelledStr, interaction, ui, true));
+        } while (!ValidationClass.validateFloat(distanceTravelledStr, interaction, true));
         float distanceTravelled = Float.parseFloat(distanceTravelledStr);
 
         FuelType fuelType;
         String fuelTypeLine;
         do {
             fuelTypeLine = readArgument("Введите Тип топлива, выберите из этих:" + "\n" + FuelType.getPossibleValues(), false);
-        } while (!ValidationClass.validateFuelType(fuelTypeLine, interaction, ui));
+        } while (!ValidationClass.validateFuelType(fuelTypeLine, interaction));
         fuelType = FuelType.valueOf(fuelTypeLine.toUpperCase());
 
         return new Vehicle(new Vehicle().generateID(), name, coordinates, creationDate, enginePower, numberOfWheels, distanceTravelled, fuelType);
-    }
-
-    public boolean isInteractionMode() {
-        return interaction;
     }
 
     /**
@@ -236,7 +230,7 @@ public class UserInterface {
         String idStr;
         do {
             idStr = readArgument("Введите id продукта: ", false);
-        } while (!ValidationClass.validateLong(idStr, interaction, ui, false));
+        } while (!ValidationClass.validateLong(idStr, interaction, false));
         return Integer.parseInt(idStr);
     }
 }

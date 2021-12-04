@@ -1,12 +1,10 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
-import common.exception.IncorrectValueException;
 import common.ui.UserInterface;
 import common.elementsOfCollection.FuelType;
-import server.Server;
 import server.interaction.StorageInteraction;
 import server.utils.ValidationClass;
 
@@ -32,13 +30,11 @@ public class CountLessThanFuelType extends Command {
 
     /**
      * Метод исполнения
-     *
-     * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, String arguments, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction storageInteraction, String arguments, DataBaseCenter dbc, User user) throws IOException {
         int result;
-        if (ValidationClass.validateFuelType(arguments, true, ui)) {
+        if (ValidationClass.validateFuelType(arguments, true)) {
             FuelType fuelType = FuelType.valueOf(arguments.toUpperCase());
             result = storageInteraction.countLessThanFuelType(fuelType);
         } else return ("Неверно введено значение Fuel Type.");

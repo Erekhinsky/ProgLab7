@@ -1,5 +1,6 @@
-package common;
+package server;
 
+import common.User;
 import common.elementsOfCollection.Coordinates;
 import common.elementsOfCollection.FuelType;
 import common.elementsOfCollection.Vehicle;
@@ -58,18 +59,7 @@ public class DataBaseCenter {
         try (java.sql.Connection connection = DriverManager.getConnection(URL, user, password)) {
             vehicle.setCreationDate(LocalDate.now());
             PreparedStatement preparedStatement = connection.prepareStatement(QueryConstants.ELEMENT_INSERTION, PreparedStatement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, vehicle.getName());
-            preparedStatement.setDouble(2, vehicle.getX());
-            preparedStatement.setDouble(3, vehicle.getY());
-            preparedStatement.setDate(4, Date.valueOf(vehicle.getCreationDate()));
-            preparedStatement.setLong(5, vehicle.getEnginePower());
-            preparedStatement.setLong(6, vehicle.getNumberOfWheels());
-            preparedStatement.setDouble(7, vehicle.getDistanceTravelled());
-            if (vehicle.getFuelType() == null)
-                preparedStatement.setNull(8, Types.VARCHAR);
-            else preparedStatement.setString(8, vehicle.getFuelType().toString());
-            preparedStatement.setString(9, loggedUser.getLogin());
-            preparedStatement.execute();
+            getVehicle(vehicle, loggedUser, preparedStatement);
             ResultSet generated = preparedStatement.getGeneratedKeys();
             if (generated.next())
                 vehicle.setId(generated.getLong(1));
@@ -79,6 +69,21 @@ public class DataBaseCenter {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private void getVehicle(Vehicle vehicle, User loggedUser, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(1, vehicle.getName());
+        preparedStatement.setDouble(2, vehicle.getX());
+        preparedStatement.setDouble(3, vehicle.getY());
+        preparedStatement.setDate(4, Date.valueOf(vehicle.getCreationDate()));
+        preparedStatement.setLong(5, vehicle.getEnginePower());
+        preparedStatement.setLong(6, vehicle.getNumberOfWheels());
+        preparedStatement.setDouble(7, vehicle.getDistanceTravelled());
+        if (vehicle.getFuelType() == null)
+            preparedStatement.setNull(8, Types.VARCHAR);
+        else preparedStatement.setString(8, vehicle.getFuelType().toString());
+        preparedStatement.setString(9, loggedUser.getLogin());
+        preparedStatement.execute();
     }
 
     public boolean updateVehicle(Vehicle vehicle, long id, User loggedUser) {
@@ -95,13 +100,13 @@ public class DataBaseCenter {
             preparedStatement.setString(1, vehicle.getName());
             preparedStatement.setDouble(2, vehicle.getX());
             preparedStatement.setDouble(3, vehicle.getY());
-            preparedStatement.setDate(4, Date.valueOf(vehicle.getCreationDate()));
-            preparedStatement.setLong(5, vehicle.getEnginePower());
-            preparedStatement.setLong(6, vehicle.getNumberOfWheels());
-            preparedStatement.setDouble(7, vehicle.getDistanceTravelled());
+            preparedStatement.setLong(4, vehicle.getEnginePower());
+            preparedStatement.setLong(5, vehicle.getNumberOfWheels());
+            preparedStatement.setDouble(6, vehicle.getDistanceTravelled());
             if (vehicle.getFuelType() == null)
-                preparedStatement.setNull(8, Types.VARCHAR);
-            else preparedStatement.setString(8, vehicle.getFuelType().toString());
+                preparedStatement.setNull(7, Types.VARCHAR);
+            else preparedStatement.setString(7, vehicle.getFuelType().toString());
+            preparedStatement.setLong(8, id);
             preparedStatement.setString(9, loggedUser.getLogin());
             preparedStatement.execute();
             return true;
@@ -112,19 +117,18 @@ public class DataBaseCenter {
     }
 
     public boolean removeVehicle(long id, User loggedUser) {
-        try (java.sql.Connection connection = DriverManager.getConnection(URL, user, password)) {
-            PreparedStatement statement = connection.prepareStatement(QueryConstants.ELEMENT_SELECT);
-            statement.setString(1, "*");
-            statement.setLong(2, id);
+        try (Connection connection = DriverManager.getConnection(URL, user, password)) {
+            PreparedStatement statement = connection.prepareStatement(QueryConstants.ELEMENT_SELECT_FOR_DELETION);
+            statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
+                System.out.println(resultSet.getString("username"));
+                System.out.println(loggedUser.getLogin());
                 if (!resultSet.getString("username").equals(loggedUser.getLogin()))
                     return false;
             }
-            PreparedStatement preparedStatement = connection.prepareStatement(QueryConstants.ELEMENT_DELETE);
-            preparedStatement.setLong(1, id);
-            preparedStatement.setString(2, "'" + loggedUser.getLogin() + "'");
-            preparedStatement.execute();
+            Statement statement1 = connection.createStatement();
+            statement1.executeUpdate("DELETE FROM vehicle WHERE id = " + id + "AND username = '" + loggedUser.getLogin() + "'");
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -148,7 +152,6 @@ public class DataBaseCenter {
                 FuelType fuelType = null;
                 if (!(resultSet.getString(8) == null))
                     fuelType = FuelType.valueOf(resultSet.getString(9));
-
                 Vehicle vehicle = new Vehicle(id, name, coordinates, creationDate, enginePower, numberOfWheels, distanceTravelled, fuelType);
                 collection.add(vehicle);
             }
@@ -161,14 +164,14 @@ public class DataBaseCenter {
 
     public boolean clearCollection(User loggedUser) {
         try (java.sql.Connection connection = DriverManager.getConnection(URL, user, password)) {
-            String query = "SELECT * FROM worker";
+            String query = "SELECT * FROM vehicle";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 long id = resultSet.getLong(1);
                 PreparedStatement deletion = connection.prepareStatement(QueryConstants.ELEMENT_DELETE);
                 deletion.setLong(1, id);
-                deletion.setString(2, "'" + loggedUser.getLogin() + "'");
+                deletion.setString(2, loggedUser.getLogin());
                 deletion.execute();
             }
             return true;

@@ -1,7 +1,6 @@
 package server.utils;
 
 import common.elementsOfCollection.FuelType;
-import common.ui.UserInterface;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -20,14 +19,13 @@ public class ValidationClass {
      *
      * @param value       Строка ввода.
      * @param interaction Режим взаимодействия.
-     * @param ui          Объект взаимодействия с пользователем.
      * @return Результат проверки.
      * @throws IOException В случае ошибки ввода/вывода.
      */
-    public static boolean validateName(String value, boolean interaction, UserInterface ui) throws IOException {
+    public static boolean validateName(String value, boolean interaction) throws IOException {
         if (value.contains(" ")) {
             if (interaction) {
-                ui.showMessage("Это поле должно быть без пробелов");
+                System.out.println("Это поле должно быть без пробелов");
             } else {
                 throw new InterruptedIOException();
             }
@@ -40,18 +38,17 @@ public class ValidationClass {
      *
      * @param value       Строка ввода.
      * @param interaction Режим взаимодействия.
-     * @param ui          Объект взаимодействия с пользователем.
      * @return Результат проверки.
      * @throws IOException В случае ошибки ввода/вывода.
      */
-    public static boolean validateDate(String value, boolean interaction, UserInterface ui) throws IOException {
+    public static boolean validateDate(String value, boolean interaction) throws IOException {
         if (!(value == null)) {
             try {
                 LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
                 return true;
             } catch (DateTimeParseException e) {
                 if (interaction)
-                    ui.showMessage("Введена дата неверного формата");
+                    System.out.println("Введена дата неверного формата");
                 else
                     throw new InterruptedIOException();
                 return false;
@@ -64,12 +61,11 @@ public class ValidationClass {
      *
      * @param value       Строка ввода.
      * @param interaction Режим взаимодействия.
-     * @param ui          Объект взаимодействия с пользователем.
      * @param nullable    Может или не может быть null.
      * @return Результат проверки.
      * @throws IOException В случае ошибки ввода/вывода.
      */
-    public static boolean validateDouble(String value, boolean interaction, UserInterface ui, boolean nullable) throws IOException {
+    public static boolean validateDouble(String value, boolean interaction, boolean nullable) throws IOException {
         if (value == null && nullable)
             return true;
         else {
@@ -81,7 +77,7 @@ public class ValidationClass {
                     return true;
                 } catch (NumberFormatException e) {
                     if (interaction)
-                        ui.showMessage("Значение должно быть вещественным числом");
+                        System.out.println("Значение должно быть вещественным числом");
                     else
                         throw new InterruptedIOException();
                     return false;
@@ -95,12 +91,11 @@ public class ValidationClass {
      *
      * @param value       строка ввода.
      * @param interaction режим взаимодействия.
-     * @param ui          объект, через который ведется взаимодействие с пользователем.
      * @param nullable    может или не можеть быть null.
      * @return true/false.
      * @throws IOException в случае ошибки ввода/вывода.
      */
-    public static boolean validateLong(String value, boolean interaction, UserInterface ui, boolean nullable) throws IOException {
+    public static boolean validateLong(String value, boolean interaction, boolean nullable) throws IOException {
         if (value == null && nullable)
             return true;
         else {
@@ -108,7 +103,7 @@ public class ValidationClass {
                 return false;
             else if (Long.parseLong(value) <= 0) {
                 if (interaction) {
-                    ui.showMessage("Введенное значение должно быть больше 0.");
+                    System.out.println("Введенное значение должно быть больше 0.");
                 }
                 return false;
             } else {
@@ -117,7 +112,7 @@ public class ValidationClass {
                     return true;
                 } catch (NumberFormatException e) {
                     if (interaction)
-                        ui.showMessage("Значение должно быть числом.");
+                        System.out.println("Значение должно быть числом.");
                     else
                         throw new InterruptedIOException();
                     return false;
@@ -131,12 +126,11 @@ public class ValidationClass {
      *
      * @param value       Строка ввода.
      * @param interaction Режим взаимодействия.
-     * @param ui          Объект взаимодействия с пользователем.
      * @param nullable    Может или не может быть null.
      * @return Результат проверки.
      * @throws IOException В случае ошибки ввода/вывода.
      */
-    public static boolean validateFloat(String value, boolean interaction, UserInterface ui, boolean nullable) throws IOException {
+    public static boolean validateFloat(String value, boolean interaction, boolean nullable) throws IOException {
         if (value == null && nullable)
             return true;
         else {
@@ -144,7 +138,7 @@ public class ValidationClass {
                 return false;
             else if (Float.parseFloat(value) <= 0) {
                 if (interaction) {
-                    ui.showMessage("Введенное значение должно быть больше 0.");
+                    System.out.println("Введенное значение должно быть больше 0.");
                 }
                 return false;
             } else
@@ -153,7 +147,7 @@ public class ValidationClass {
                     return true;
                 } catch (NumberFormatException e) {
                     if (interaction)
-                        ui.showMessage("Значение должно быть вещественным числом");
+                        System.out.println("Значение должно быть вещественным числом");
                     else
                         throw new InterruptedIOException();
                     return false;
@@ -167,17 +161,16 @@ public class ValidationClass {
      *
      * @param value       Строка ввода.
      * @param interaction Режим взаимодействия.
-     * @param ui          Объект взаимодействия с пользователем.
      * @return Результат проверки.
      * @throws IOException В случае ошибки ввода/вывода.
      */
-    public static boolean validateFuelType(String value, boolean interaction, UserInterface ui) throws IOException {
+    public static boolean validateFuelType(String value, boolean interaction) throws IOException {
         if (!(value == null)) {
             try {
                 return FuelType.getPossibleValues().contains(FuelType.valueOf(value.toUpperCase()));
             } catch (IllegalArgumentException e) {
                 if (interaction)
-                    ui.showMessage("Указано некорректное значение");
+                    System.out.println("Указано некорректное значение");
                 else
                     throw new InterruptedIOException();
                 return false;

@@ -1,6 +1,6 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.exception.IncorrectValueException;
@@ -31,13 +31,12 @@ public class RemoveById extends Command {
     /**
      * Метод исполнения
      *
-     * @param ui        объект, через который ведется взаимодействие с пользователем.
      * @param arguments необходимые для исполнения аргументы.
      */
-    public String execute(UserInterface ui, String arguments, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction storageInteraction, String arguments,  DataBaseCenter dbc, User user) throws IOException {
         long id = 0;
         try {
-            if (ValidationClass.validateLong(arguments, true, ui, false))
+            if (ValidationClass.validateLong(arguments, true, false))
                 id = Long.parseLong(arguments);
             else throw new IncorrectValueException("Неверное введенное значение");
         } catch (IOException | IncorrectValueException e) {

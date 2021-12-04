@@ -22,7 +22,6 @@ public class Client {
     private DatagramSocket socket;
     private final UserInterface userInterface = new UserInterface(new InputStreamReader(System.in), true, new OutputStreamWriter(System.out));
     private User user = null;
-    private boolean authorise = false;
 
     public static void main(String[] args) {
         Client client = new Client();
@@ -64,15 +63,16 @@ public class Client {
         while (scanner.hasNextLine()) {
             String[] input = scanner.nextLine().trim().split(" ");
             Command cmd = CommandCenter.getInstance().getCmdCommand(input[0]);
-            if (cmd.getCmdLine().equals("exit")){
-                break;
-            }
-            if (!cmd.getServerCommandLabel()) {
+
+            if (!(cmd == null) && !cmd.getServerCommandLabel()) {
+                if (cmd.getCmdLine().equals("exit")){
+                    break;
+                }
                 byte[] cmdByte;
                 if (cmd.getArgumentAmount() == 0) {
+                    cmd.setUser(user);
                     cmdByte = SerializationTool.serialize(cmd);
                     send(cmdByte);
-                    cmd.setUser(user);
                     userInterface.showMessage(receive());
                 }
                 if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {

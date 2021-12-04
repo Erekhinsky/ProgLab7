@@ -1,11 +1,13 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
 import common.elementsOfCollection.Vehicle;
 import server.interaction.StorageInteraction;
+
+import java.util.List;
 
 /**
  * Класс команды remove_lower.
@@ -27,15 +29,16 @@ public class RemoveLower extends Command {
 
     /**
      * Метод исполнения
-     *
-     * @param ui объект, через который ведется взаимодействие с пользователем.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) {
+    public String execute(StorageInteraction storageInteraction, Vehicle vehicle, DataBaseCenter dbc, User user) {
         int size1 = storageInteraction.getSize();
-        storageInteraction.removeLower(vehicle);
+        List<Long> idRemoved = storageInteraction.removeLower(vehicle);
         int size2 = storageInteraction.getSize();
         if (size2 < size1) {
+            for (Long aLong : idRemoved) {
+                dbc.removeVehicle(aLong, user);
+            }
             dbc.retrieveCollectionFromDB(storageInteraction);
             return ("Операция успешно выполнена");
         }

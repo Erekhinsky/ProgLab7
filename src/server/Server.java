@@ -1,6 +1,5 @@
 package server;
 
-import common.DataBaseCenter;
 import common.SerializationTool;
 import common.User;
 import common.commands.abstracts.Command;
@@ -101,27 +100,27 @@ public class Server implements Runnable {
         if (!cmd.getCmdLine().equals("login") && !cmd.getCmdLine().equals("register") && authorise) {
             if (cmd.getServerCommandLabel()) {
                 logger.log(Level.INFO, "Выполнение серверной команды - " + cmd.getCmdLine() + "\n");
-                result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction);
+                result = CommandCenter.getInstance().executeCommand(cmd, storageInteraction);
             } else {
                 if (cmd.getArgumentAmount() == 0) {
                     logger.log(Level.INFO, "Выполнение команды без аргументов - " + cmd.getCmdLine() + "\n");
-                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, dbc) + "\nВведите команду:";
+                    result = CommandCenter.getInstance().executeCommand(cmd, storageInteraction, dbc) + "\nВведите команду:";
                 }
                 if (cmd.getArgumentAmount() == 1 && !cmd.getNeedsObject()) {
                     logger.log(Level.INFO, "Выполнение команды с аргументом - " + cmd.getCmdLine() + "\n");
                     argument = cmd.getArgument();
-                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, dbc) + "\nВведите команду:";
+                    result = CommandCenter.getInstance().executeCommand(cmd, argument, storageInteraction, dbc) + "\nВведите команду:";
                 }
                 if (cmd.getArgumentAmount() == 1 && cmd.getNeedsObject()) {
                     logger.log(Level.INFO, "Выполнение команды с аргументом-объектом - " + cmd.getCmdLine() + "\n");
                     vehicle = cmd.getObject();
-                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, storageInteraction, vehicle, dbc) + "\nВведите команду:";
+                    result = CommandCenter.getInstance().executeCommand(cmd, storageInteraction, vehicle, dbc) + "\nВведите команду:";
                 }
                 if (cmd.getArgumentAmount() == 2 && cmd.getNeedsObject()) {
                     logger.log(Level.INFO, "Выполнение команды с аргументом и аргументом-объектом - " + cmd.getCmdLine() + "\n");
                     argument = cmd.getArgument();
                     vehicle = cmd.getObject();
-                    result = CommandCenter.getInstance().executeCommand(userInterface, cmd, argument, storageInteraction, vehicle, dbc) + "\nВведите команду:";
+                    result = CommandCenter.getInstance().executeCommand(cmd, argument, storageInteraction, vehicle, dbc) + "\nВведите команду:";
                 }
             }
         }
@@ -251,21 +250,21 @@ public class Server implements Runnable {
     public boolean authoriseUser(User user, String existence) throws IOException, SQLException {
         if (existence.equals("new")) {
             if (dbc.addUser(user)) {
-                CommandCenter.getInstance().executeCommand(userInterface, new Register(), storageInteraction);
+                CommandCenter.getInstance().executeCommand(new Register(), storageInteraction);
                 logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Register success" + "\n");
                 return true;
             } else {
-                CommandCenter.getInstance().executeCommand(userInterface, new Register(), storageInteraction);
+                CommandCenter.getInstance().executeCommand(new Register(), storageInteraction);
                 logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Register fail" + "\n");
                 return false;
             }
         } else {
             if (dbc.loginUser(user)) {
-                CommandCenter.getInstance().executeCommand(userInterface, new Login(), storageInteraction);
+                CommandCenter.getInstance().executeCommand(new Login(), storageInteraction);
                 logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Login success" + "\n");
                 return true;
             } else {
-                CommandCenter.getInstance().executeCommand(userInterface, new Login(), storageInteraction);
+                CommandCenter.getInstance().executeCommand(new Login(), storageInteraction);
                 logger.log(Level.INFO, "<" + user.getLogin() + ">" + ": " + "Login fail" + "\n");
                 return false;
             }

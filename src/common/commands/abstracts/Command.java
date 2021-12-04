@@ -1,6 +1,6 @@
 package common.commands.abstracts;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.elementsOfCollection.Vehicle;
 import common.exception.IncorrectValueException;
@@ -29,7 +29,6 @@ public abstract class Command implements Serializable {
     protected int argumentAmount;
     protected boolean serverCommandLabel;
     protected boolean editsCollection;
-    protected StringBuilder messageToClient;
 
     /**
      * Аргументы команды.
@@ -41,29 +40,26 @@ public abstract class Command implements Serializable {
     /**
      * Методы исполнения команды.
      *
-     * @param ui       Объект для взаимодействия с пользователем.
      */
-    public String execute(UserInterface ui, StorageInteraction si, String argument, Vehicle vehicle, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction si, String argument, Vehicle vehicle, DataBaseCenter dbc, User user) throws IOException {
         return null;
     }
 
-    public String execute(UserInterface ui, StorageInteraction si, Vehicle vehicle, DataBaseCenter dbc, User user) throws IOException, IncorrectValueException {
+    public String execute(StorageInteraction si, Vehicle vehicle, DataBaseCenter dbc, User user) throws IOException, IncorrectValueException {
         return null;
     }
 
-    public String execute(UserInterface ui, StorageInteraction si, String argument, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction si, String argument, DataBaseCenter dbc, User user) throws IOException {
         return null;
     }
 
-    public String execute(UserInterface ui, StorageInteraction si, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction si, DataBaseCenter dbc, User user) throws IOException {
         return null;
     }
 
-    public String execute(UserInterface ui, StorageInteraction si, User user) throws IOException {
+    public String execute(StorageInteraction si, User user) throws IOException {
         return null;
     }
-
-
 
     /**
      * Пустой конструктор Command.

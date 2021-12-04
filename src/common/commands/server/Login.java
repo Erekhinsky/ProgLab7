@@ -13,7 +13,7 @@ public class Login extends Command {
         editsCollection = false;
     }
 
-    public String execute(UserInterface ui, boolean success) {
+    public String execute(boolean success) {
         if (success)
             return ("Вход в систему успешен!");
         else return ("Вход в систему не удался.");

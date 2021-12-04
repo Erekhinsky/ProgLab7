@@ -3,7 +3,6 @@ package server.interaction;
 import common.elementsOfCollection.*;
 import common.exception.IncorrectValueException;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -59,13 +58,6 @@ public interface CommandInterface {
      */
     void clear();
 
-//    /**
-//     * Команда save.
-//     *
-//     * @throws IOException В случае ошибки.
-//     */
-//    void save() throws IOException;
-
     /**
      * Команда exit.
      */
@@ -73,8 +65,9 @@ public interface CommandInterface {
 
     /**
      * Команда remove_first.
+     * @return
      */
-    void removeFirst();
+    long removeFirst();
 
     /**
      * Команда add_if_max.
@@ -87,8 +80,9 @@ public interface CommandInterface {
      * Команда remove_lower.
      *
      * @param vehicle Транспорт, относительно которого будет происходить удаление.
+     * @return
      */
-    void removeLower(Vehicle vehicle);
+    List<Long> removeLower(Vehicle vehicle);
 
     /**
      * Команда count_less_than_fuel_type.

@@ -13,7 +13,7 @@ public class Register extends Command {
         editsCollection = false;
     }
 
-    public String execute(UserInterface ui, boolean success) {
+    public String execute(boolean success) {
         if (success)
             return ("Регистрация успешна!");
         else return ("Регистрация не удалась.");

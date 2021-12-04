@@ -1,11 +1,9 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
-import common.exception.IncorrectValueException;
 import common.ui.UserInterface;
-import server.Server;
 import server.interaction.StorageInteraction;
 
 import java.io.IOException;
@@ -31,10 +29,9 @@ public class Clear extends Command {
     /**
      * Метод исполнения
      *
-     * @param ui объект, через который ведется взаимодействие с пользователем.
      * @return Результат команды.
      */
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
+    public String execute(StorageInteraction storageInteraction, DataBaseCenter dbc, User user) throws IOException {
         if (!(dbc.clearCollection(user)))
             return "Что-то пошло не так, попробуйте еще раз";
         else {

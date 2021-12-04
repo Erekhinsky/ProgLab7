@@ -1,10 +1,9 @@
 package common.commands.user;
 
-import common.DataBaseCenter;
+import server.DataBaseCenter;
 import common.User;
 import common.commands.abstracts.Command;
 import common.ui.UserInterface;
-import server.Server;
 import server.interaction.StorageInteraction;
 
 import java.io.IOException;
@@ -29,12 +28,10 @@ public class Exit extends Command {
 
     /**
      * Метод исполнения
-     *
-     * @param ui объект, через который ведется взаимодействие с пользователем.
      * @return Результат команды.
      */
     @Override
-    public String execute(UserInterface ui, StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
+    public String execute(StorageInteraction storageInteraction, DataBaseCenter dataBaseCenter, User user) throws IOException {
         System.exit(0);
         return ("Завершение работы");
     }
